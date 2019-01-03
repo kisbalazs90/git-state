@@ -224,3 +224,18 @@ exports.messageSync = function messageSync (repo, opts) {
   opts = opts || {}
   return execSync('git log -1 --pretty=%B', {cwd: repo, maxBuffer: opts.maxBuffer}).toString().trim()
 }
+
+exports.userName = function userName (repo, opts) {
+  opts = opts || {}
+  return execSync('git config user.name', {cwd: repo, maxBuffer: opts.maxBuffer}).toString();
+}
+
+exports.userEmail = function userEmail (repo, opts) {
+  opts = opts || {}
+  return execSync('git config user.email', {cwd: repo, maxBuffer: opts.maxBuffer}).toString();
+}
+
+exports.repository = function repository (repo, opts) {
+  opts = opts || {}
+  return execSync('git rev-parse --show-toplevel', {cwd: repo, maxBuffer: opts.maxBuffer}).toString();
+}
