@@ -237,5 +237,5 @@ exports.userEmail = function userEmail (repo, opts) {
 
 exports.repository = function repository (repo, opts) {
   opts = opts || {}
-  return execSync('git rev-parse --show-toplevel', {cwd: repo, maxBuffer: opts.maxBuffer}).toString().trim();
+  return execSync('basename -s .git `git config --get remote.origin.url`', {cwd: repo, maxBuffer: opts.maxBuffer}).toString().trim();
 }
