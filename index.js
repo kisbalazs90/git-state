@@ -24,6 +24,7 @@ exports.isGitSync = function isGitSync (dir) {
 
 exports.checkSync = function checkSync (repo, opts) {
   var branch = exports.branchSync(repo, opts)
+  var branchId = exports.branchIdSync(repo, opts)
   var ahead = exports.aheadSync(repo, opts)
   var status = statusSync(repo, opts)
   var stashes = exports.stashesSync(repo, opts)
@@ -83,8 +84,6 @@ exports.dirty = function dirty (repo, opts, cb) {
 }
 
 exports.branch = function branch (repo, opts, cb) {
-  if (typeof opts === 'function') return exports.branch(repo, {}, opts)
-  opts = opts || {}
 
   exec('git show-ref >' + nullPath + ' 2>&1 && git rev-parse --abbrev-ref HEAD', {cwd: repo, maxBuffer: opts.maxBuffer}, function (err, stdout, stderr) {
     if (err) {
@@ -93,6 +92,18 @@ exports.branch = function branch (repo, opts, cb) {
       return cb() // most likely the git repo doesn't have any commits yet
     }
     cb(null, stdout.trim())
+  })
+}
+
+exports.branchId = function branchId (repo, opts) {
+  
+  console.log('branch Id ASYNC Repo:', repo);
+
+  if (typeof opts === 'function') return exports.branchId(repo, {}, opts)
+  opts = opts || {}
+
+  exec('git rev-parse HEAD', {cwd: repo, maxBuffer: opts.maxBuffer}, function (err, stdout, stderr) {
+    cb(stdout.trim())
   })
 }
 
@@ -174,6 +185,20 @@ exports.branchSync = function branchSync (repo, opts) {
     var stdout = execSync('git show-ref >' + nullPath + ' 2>&1 && git rev-parse --abbrev-ref HEAD', {cwd: repo, maxBuffer: opts.maxBuffer}).toString()
     return stdout.trim()
   } catch (err) {
+    if (err.code === 'ENOBUFS') throw err
+    return null // most likely the git repo doesn't have any commits yet
+  }
+}
+
+exports.branchIdSync = function branchIdSync (repo, opts) {
+  opts = opts || {}
+
+  console.log('branchIdSync Repo:', repo);
+  
+  try {
+    var stdout = execSync('git rev-parse HEAD', {cwd: repo, maxBuffer: opts.maxBuffer}, {cwd: repo, maxBuffer: opts.maxBuffer}).toString()
+    return stdout.trim();
+  } catch (error) {
     if (err.code === 'ENOBUFS') throw err
     return null // most likely the git repo doesn't have any commits yet
   }
